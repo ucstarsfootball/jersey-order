@@ -364,7 +364,7 @@
 
 <script>
   // ── IMPORTANT: paste your Apps Script /exec URL here ──────────────────────
-  const API_URL = 'https://script.google.com/macros/s/AKfycbw6o2jh78d8CyK2tByc3VtvzcCKnT4wZiajFIC6yCvulFhVSV5cjDPjZgwuD6ME5KIs/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycby0QyLFw2IBmFcPnewX7Q1k2XUJZKvNYN753qvpYQAl9eI_5DkXULcvGMRSs-TzESHo/exec';
   // ──────────────────────────────────────────────────────────────────────────
 
   const TEAMS = {
@@ -455,7 +455,7 @@
   function onNumbersLoaded(nums) {
     const sel = document.getElementById('numberSelect');
     document.getElementById('numbersLoadingRow').style.display = 'none';
-    sel.innerHTML = '<option value="">— Select a number —</option>';
+    sel.innerHTML = '<option value=""> Select a number </option>';
     if (!nums || nums.length === 0) {
       sel.innerHTML = '<option value="">All numbers have been taken</option>';
     } else {
@@ -530,7 +530,12 @@
     })
       .then(function (data) {
         if (!data.success) throw new Error(data.error || 'Something went wrong.');
-        window.top.location.href = data.url;   // Full page redirect to Stripe — no iframe issues
+        // Try to break out of iframe first, fall back to new tab
+        try {
+          window.top.location.href = data.url;
+        } catch(e) {
+          window.open(data.url, '_blank');
+        }
       })
       .catch(function (err) {
         isSubmitting = false;
@@ -545,10 +550,38 @@
 
   // ── Helpers ──────────────────────────────────────────────────────────────
   function apiFetch(action, params) {
-    const url = new URL(API_URL);
-    url.searchParams.set('action', action);
-    Object.keys(params).forEach(function (k) { url.searchParams.set(k, params[k]); });
-    return fetch(url.toString()).then(function (r) { return r.json(); });
+    return new Promise(function (resolve, reject) {
+      const callbackName = 'cb_' + Math.random().toString(36).substr(2, 8);
+      const url = new URL(API_URL);
+      url.searchParams.set('action', action);
+      url.searchParams.set('callback', callbackName);
+      Object.keys(params).forEach(function (k) { url.searchParams.set(k, params[k]); });
+
+      const script = document.createElement('script');
+      const timeout = setTimeout(function () {
+        cleanup();
+        reject(new Error('Request timed out. Please try again.'));
+      }, 35000);
+
+      window[callbackName] = function (data) {
+        cleanup();
+        resolve(data);
+      };
+
+      function cleanup() {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      script.onerror = function () {
+        cleanup();
+        reject(new Error('Could not reach server. Please try again.'));
+      };
+
+      script.src = url.toString();
+      document.head.appendChild(script);
+    });
   }
 
   function showScreen(id) {
