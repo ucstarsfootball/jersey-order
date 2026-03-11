@@ -530,7 +530,7 @@
     })
       .then(function (data) {
         if (!data.success) throw new Error(data.error || 'Something went wrong.');
-        window.location.href = data.url;   // Full page redirect to Stripe — no iframe issues
+        window.top.location.href = data.url;   // Full page redirect to Stripe — no iframe issues
       })
       .catch(function (err) {
         isSubmitting = false;
