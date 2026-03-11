@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jersey Order — UC Stars Football</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #f9f9f9;
+      --surface: #efefef;
+      --border:  #e0e0e0;
+      --accent:  #29B8D8;
+      --btn:     #1c4678;
+      --btn-dk:  #163660;
+      --text:    #111111;
+      --muted:   #666666;
+      --error:   #d32f2f;
+      --radius:  6px;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 1rem 3rem;
+    }
+
+    header {
+      width: 100%;
+      max-width: 480px;
+      padding: 2rem 0 1.5rem;
+      text-align: center;
+    }
+
+    .club-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .team-heading {
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      color: var(--text);
+    }
+
+    .team-heading span { color: var(--accent); }
+
+    .price-badge {
+      display: inline-block;
+      margin-top: 0.6rem;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.75rem;
+    }
+
+    .field { margin-bottom: 1.4rem; }
+
+    label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.7rem 1rem;
+      transition: border-color 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .size-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    .size-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.6rem 0;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .size-btn:hover  { border-color: var(--accent); color: var(--accent); }
+    .size-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 3.2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .summary.filled { color: var(--text); }
+    .summary strong { color: var(--accent); }
+
+    .btn-pay, .btn-select-team {
+      width: 100%;
+      background: var(--btn);
+      color: #f9f9f9;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.9rem;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-select-team { margin-top: 0.5rem; }
+    .btn-pay:hover:not(:disabled),
+    .btn-select-team:hover:not(:disabled) { background: var(--btn-dk); }
+    .btn-pay:active:not(:disabled)        { transform: scale(0.99); }
+    .btn-pay:disabled,
+    .btn-select-team:disabled             { opacity: 0.4; cursor: not-allowed; }
+
+    .loading-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.4rem;
+    }
+
+    .state-page {
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      padding-top: 3rem;
+    }
+
+    .state-icon  { font-size: 3rem; margin-bottom: 1rem; }
+
+    .state-title {
+      font-weight: 900;
+      font-size: 2rem;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .state-sub { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+    .state-detail {
+      display: inline-block;
+      margin-top: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+    #successScreen    { display: none; }
+    #teamPickerScreen { display: block; }
+    #orderFormScreen  { display: none; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── SUCCESS ── -->
+  <div id="successScreen">
+    <header>
+      <div class="club-name">UC Stars Football</div>
+    </header>
+    <div class="state-page">
+      <div class="state-icon">✅</div>
+      <div class="state-title" style="color: var(--accent)">Order Confirmed</div>
+      <p class="state-sub">
+        Your payment was successful and your jersey number has been locked in.<br>
+        You'll receive a confirmation email from Stripe shortly.
+      </p>
+      <div class="state-detail" id="orderIdDisplay" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 1: Team picker ── -->
+  <div id="teamPickerScreen">
+    <header>
+      <div class="club-name">UC Stars Football</div>
+      <div class="team-heading">Order Your<br><span>Jersey</span></div>
+    </header>
+    <div class="card">
+      <div class="field">
+        <label>Select Your Team</label>
+        <div class="select-wrap">
+          <select id="teamSelect">
+            <option value="">— Choose a team —</option>
+            <option value="div1-2-mens">Div 1 &amp; 2 Mens</option>
+            <option value="div3-mens">Div 3 Mens</option>
+            <option value="div6-mens">Div 6 Mens</option>
+            <option value="div7-mens">Div 7 Mens</option>
+            <option value="div8-mens">Div 8 Mens</option>
+            <option value="div1-womens">Div 1 Womens</option>
+            <option value="div2-red-womens">Div 2 Red Womens</option>
+            <option value="div2-blue-womens">Div 2 Blue Womens</option>
+            <option value="div3-womens">Div 3 Womens</option>
+            <option value="div5-womens">Div 5 Womens</option>
+            <option value="masters">Masters 1, 2 &amp; 3</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-select-team" id="btnSelectTeam" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 2: Order form ── -->
+  <div id="orderFormScreen">
+    <header>
+      <div class="club-name">UC Stars Football</div>
+      <div class="team-heading" id="formTeamHeading"></div>
+      <div class="price-badge">$35.00 AUD</div>
+      <p id="cancelledMsg" style="display:none; margin-top:1rem; color: var(--muted); font-size:0.85rem;">
+        Your previous order was cancelled. Your number has been released — feel free to try again.
+      </p>
+    </header>
+    <div class="card">
+
+      <div class="field">
+        <label>Jersey Number</label>
+        <div class="select-wrap">
+          <select id="numberSelect" disabled>
+            <option value="">Loading available numbers…</option>
+          </select>
+        </div>
+        <div id="numbersLoadingRow" class="loading-row" style="margin-top:0.5rem;">
+          <div class="spinner"></div>
+          <span>Checking availability…</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Name on Jersey</label>
+        <input type="text" id="playerName" placeholder="e.g. SMITH" maxlength="20">
+      </div>
+
+      <div class="field">
+        <label>Size</label>
+        <div class="size-grid" id="sizeGrid">
+          <button type="button" class="size-btn" data-size="XS">XS</button>
+          <button type="button" class="size-btn" data-size="S">S</button>
+          <button type="button" class="size-btn" data-size="M">M</button>
+          <button type="button" class="size-btn" data-size="L">L</button>
+          <button type="button" class="size-btn" data-size="XL">XL</button>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="summary" id="summaryBox">
+        <span>Fill in the fields above to see your order summary.</span>
+      </div>
+
+      <div id="errorMsg" class="error-msg" style="display:none; margin-bottom:1rem;"></div>
+
+      <button class="btn-pay" id="payBtn" disabled>Proceed to Payment — $35.00</button>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── IMPORTANT: paste your Apps Script /exec URL here ──────────────────────
+  const API_URL = 'https://script.google.com/macros/s/AKfycby0QyLFw2IBmFcPnewX7Q1k2XUJZKvNYN753qvpYQAl9eI_5DkXULcvGMRSs-TzESHo/exec';
+  // ──────────────────────────────────────────────────────────────────────────
+
+  const TEAMS = {
+    'div1-2-mens':      'Div 1 & 2 Mens',
+    'div3-mens':        'Div 3 Mens',
+    'div6-mens':        'Div 6 Mens',
+    'div7-mens':        'Div 7 Mens',
+    'div8-mens':        'Div 8 Mens',
+    'div1-womens':      'Div 1 Womens',
+    'div2-red-womens':  'Div 2 Red Womens',
+    'div2-blue-womens': 'Div 2 Blue Womens',
+    'div3-womens':      'Div 3 Womens',
+    'div5-womens':      'Div 5 Womens',
+    'masters':          'Masters 1, 2 & 3',
+  };
+
+  let selectedTeam = '';
+  let selectedSize = '';
+  let isSubmitting = false;
+
+  // ── On page load: check URL params ──────────────────────────────────────
+  (function init() {
+    const params   = new URLSearchParams(window.location.search);
+    const status   = params.get('status')  || '';
+    const orderId  = params.get('orderId') || '';
+    const team     = params.get('team')    || '';
+
+    if (status === 'success') {
+      showScreen('successScreen');
+      if (orderId) {
+        const el = document.getElementById('orderIdDisplay');
+        el.textContent = 'Order ID: ' + orderId;
+        el.style.display = 'inline-block';
+      }
+      return;
+    }
+
+    if (team && TEAMS[team]) {
+      // Coming back from a cancelled payment — jump straight to form
+      if (status === 'cancelled') {
+        document.getElementById('cancelledMsg').style.display = 'block';
+      }
+      selectedTeam = team;
+      showOrderForm(team);
+      return;
+    }
+
+    showScreen('teamPickerScreen');
+  })();
+
+  // ── Team picker ──────────────────────────────────────────────────────────
+  document.getElementById('teamSelect').addEventListener('change', function () {
+    document.getElementById('btnSelectTeam').disabled = !this.value;
+  });
+
+  document.getElementById('btnSelectTeam').addEventListener('click', function () {
+    selectedTeam = document.getElementById('teamSelect').value;
+    if (!selectedTeam) return;
+    showOrderForm(selectedTeam);
+  });
+
+  function showOrderForm(team) {
+    const teamName = TEAMS[team];
+    document.getElementById('formTeamHeading').innerHTML =
+      teamName + '<br><span style="color:var(--accent)">Jerseys</span>';
+    showScreen('orderFormScreen');
+    loadNumbers();
+    document.getElementById('numberSelect').addEventListener('change', updateSummary);
+  }
+
+  // ── Number loading ───────────────────────────────────────────────────────
+  function loadNumbers() {
+    document.getElementById('numbersLoadingRow').style.display = 'flex';
+    document.getElementById('numberSelect').disabled = true;
+    document.getElementById('numberSelect').innerHTML = '<option value="">Loading available numbers…</option>';
+
+    apiFetch('getNumbers', { team: selectedTeam })
+      .then(function (data) {
+        if (!data.success) throw new Error(data.error || 'Could not load numbers.');
+        onNumbersLoaded(data.numbers);
+      })
+      .catch(function () {
+        document.getElementById('numbersLoadingRow').innerHTML =
+          '<span style="color:var(--error)">Could not load numbers. Please refresh.</span>';
+      });
+  }
+
+  function onNumbersLoaded(nums) {
+    const sel = document.getElementById('numberSelect');
+    document.getElementById('numbersLoadingRow').style.display = 'none';
+    sel.innerHTML = '<option value="">— Select a number —</option>';
+    if (!nums || nums.length === 0) {
+      sel.innerHTML = '<option value="">All numbers have been taken</option>';
+    } else {
+      nums.forEach(function (n) {
+        var opt = document.createElement('option');
+        opt.value = n;
+        opt.textContent = n;
+        sel.appendChild(opt);
+      });
+      sel.disabled = false;
+    }
+  }
+
+  // ── Size selection ───────────────────────────────────────────────────────
+  document.getElementById('sizeGrid').addEventListener('click', function (e) {
+    const btn = e.target.closest('.size-btn');
+    if (!btn) return;
+    selectedSize = btn.dataset.size;
+    document.querySelectorAll('.size-btn').forEach(function (b) {
+      b.classList.toggle('active', b === btn);
+    });
+    updateSummary();
+  });
+
+  // ── Name input ───────────────────────────────────────────────────────────
+  document.getElementById('playerName').addEventListener('input', function () {
+    this.value = this.value.toUpperCase();
+    updateSummary();
+  });
+
+  // ── Summary + pay button state ───────────────────────────────────────────
+  function updateSummary() {
+    const number = document.getElementById('numberSelect').value;
+    const name   = document.getElementById('playerName').value.trim();
+    const box    = document.getElementById('summaryBox');
+    const btn    = document.getElementById('payBtn');
+    const ready  = number && name && selectedSize;
+
+    if (ready) {
+      box.className = 'summary filled';
+      box.innerHTML = '<strong>#' + number + '</strong>&nbsp; ' + name +
+        '&nbsp; <strong>' + selectedSize + '</strong>' +
+        '&nbsp;&nbsp;·&nbsp;&nbsp;$35.00 AUD';
+    } else {
+      box.className = 'summary';
+      box.innerHTML = '<span>Fill in the fields above to see your order summary.</span>';
+    }
+    btn.disabled = !ready || isSubmitting;
+  }
+
+  // ── Payment submission ───────────────────────────────────────────────────
+  document.getElementById('payBtn').addEventListener('click', handleSubmit);
+
+  function handleSubmit() {
+    if (isSubmitting) return;
+    clearError();
+
+    const number = document.getElementById('numberSelect').value;
+    const name   = document.getElementById('playerName').value.trim();
+    if (!number || !name || !selectedSize) return;
+
+    isSubmitting = true;
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.textContent = 'Redirecting to payment…';
+
+    apiFetch('createCheckout', {
+      team:       selectedTeam,
+      number:     number,
+      playerName: name,
+      size:       selectedSize,
+    })
+      .then(function (data) {
+        if (!data.success) throw new Error(data.error || 'Something went wrong.');
+        window.location.href = data.url;   // Full page redirect to Stripe — no iframe issues
+      })
+      .catch(function (err) {
+        isSubmitting = false;
+        btn.disabled = false;
+        btn.textContent = 'Proceed to Payment — $35.00';
+        showError(err.message || 'Something went wrong. Please try again.');
+        loadNumbers();
+        document.getElementById('numberSelect').value = '';
+        updateSummary();
+      });
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  function apiFetch(action, params) {
+    const url = new URL(API_URL);
+    url.searchParams.set('action', action);
+    Object.keys(params).forEach(function (k) { url.searchParams.set(k, params[k]); });
+    return fetch(url.toString()).then(function (r) { return r.json(); });
+  }
+
+  function showScreen(id) {
+    ['successScreen','teamPickerScreen','orderFormScreen'].forEach(function (s) {
+      document.getElementById(s).style.display = s === id ? 'block' : 'none';
+    });
+  }
+
+  function showError(msg) {
+    var el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function clearError() {
+    var el = document.getElementById('errorMsg');
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+</script>
+</body>
+</html>
