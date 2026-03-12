@@ -266,12 +266,14 @@
 <body>
 
   <!-- ── BANNER (full width, no crop) ── -->
-  <img src="UC_Banner.png" alt="UC Stars Football" style="width:100%; display:block;">
+  <img src="UC%20Banner.png" alt="UC Stars Football" style="width:100%; display:block;">
+
+  <div class="page">
 
   <!-- ── SUCCESS ── -->
   <div id="successScreen">
     <header>
-      <img src="UC_Football_Wording.png" alt="UC Stars Football" style="width:260px; margin-bottom:1rem; display:block; margin-left:auto; margin-right:auto;">
+      <img src="UC%20Football%20Wording.png" alt="UC Stars Football" style="width:260px; margin-bottom:1rem; display:block; margin-left:auto; margin-right:auto;">
     </header>
     <div class="state-page">
       <div class="state-icon">✅</div>
@@ -287,7 +289,7 @@
   <!-- ── SCREEN 1: Team picker ── -->
   <div id="teamPickerScreen">
     <header>
-      <img src="UC_Football_Wording.png" alt="UC Stars Football" style="width:260px; margin-bottom:1rem; display:block; margin-left:auto; margin-right:auto;">
+      <img src="UC%20Football%20Wording.png" alt="UC Stars Football" style="width:260px; margin-bottom:1rem; display:block; margin-left:auto; margin-right:auto;">
       <div class="team-heading" id="formTeamHeading"></div>
       <div class="price-badge">$35.00 AUD</div>
       <p id="cancelledMsg" style="display:none; margin-top:1rem; color: var(--muted); font-size:0.85rem;">
@@ -344,7 +346,7 @@
     </div>
   </div>
 
-</div>
+  </div><!-- end .page -->
 
 <script>
   // ── IMPORTANT: paste your Apps Script /exec URL here ──────────────────────
@@ -399,21 +401,13 @@
   })();
 
   // ── Team picker ──────────────────────────────────────────────────────────
-  document.getElementById('teamSelect').addEventListener('change', function () {
-    document.getElementById('btnSelectTeam').disabled = !this.value;
-  });
-
-  document.getElementById('btnSelectTeam').addEventListener('click', function () {
-    selectedTeam = document.getElementById('teamSelect').value;
-    if (!selectedTeam) return;
-    showOrderForm(selectedTeam);
-  });
+  // (Team is passed via URL ?team= param from Google Sites — no picker needed)
 
   function showOrderForm(team) {
     const teamName = TEAMS[team];
     document.getElementById('formTeamHeading').innerHTML =
       teamName + '<br><span style="color:var(--accent)">Jerseys</span>';
-    showScreen('orderFormScreen');
+    showScreen('teamPickerScreen');
     loadNumbers();
     document.getElementById('numberSelect').addEventListener('change', updateSummary);
   }
@@ -569,7 +563,7 @@
   }
 
   function showScreen(id) {
-    ['successScreen','teamPickerScreen','orderFormScreen'].forEach(function (s) {
+    ['successScreen', 'teamPickerScreen'].forEach(function (s) {
       document.getElementById(s).style.display = s === id ? 'block' : 'none';
     });
   }
