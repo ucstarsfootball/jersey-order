@@ -290,6 +290,37 @@
   <div id="teamPickerScreen">
     <header>
       <img src="UC%20Football%20Wording.png" alt="UC Stars Football" style="width:260px; margin-bottom:1rem; display:block; margin-left:auto; margin-right:auto;">
+      <div class="team-heading">Order Your<br><span>Jersey</span></div>
+      <div class="price-badge">$35.00 AUD</div>
+    </header>
+    <div class="card">
+      <div class="field">
+        <label>Select Your Team</label>
+        <div class="select-wrap">
+          <select id="teamSelect">
+            <option value="">— Select a team —</option>
+            <option value="div1-2-mens">Div 1 &amp; 2 Mens</option>
+            <option value="div3-mens">Div 3 Mens</option>
+            <option value="div6-mens">Div 6 Mens</option>
+            <option value="div7-mens">Div 7 Mens</option>
+            <option value="div8-mens">Div 8 Mens</option>
+            <option value="div1-womens">Div 1 Womens</option>
+            <option value="div2-red-womens">Div 2 Red Womens</option>
+            <option value="div2-blue-womens">Div 2 Blue Womens</option>
+            <option value="div3-womens">Div 3 Womens</option>
+            <option value="div5-womens">Div 5 Womens</option>
+            <option value="masters">Masters 1, 2 &amp; 3</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-pay" id="btnSelectTeam" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 2: Order form ── -->
+  <div id="orderFormScreen" style="display:none;">
+    <header>
+      <img src="UC%20Football%20Wording.png" alt="UC Stars Football" style="width:260px; margin-bottom:1rem; display:block; margin-left:auto; margin-right:auto;">
       <div class="team-heading" id="formTeamHeading"></div>
       <div class="price-badge">$35.00 AUD</div>
       <p id="cancelledMsg" style="display:none; margin-top:1rem; color: var(--muted); font-size:0.85rem;">
@@ -302,10 +333,10 @@
         <label>Jersey Number</label>
         <div class="select-wrap">
           <select id="numberSelect" disabled>
-            <option value="">Loading available numbers…</option>
+            <option value="">— Select a number —</option>
           </select>
         </div>
-        <div id="numbersLoadingRow" class="loading-row" style="margin-top:0.5rem;">
+        <div id="numbersLoadingRow" class="loading-row" style="margin-top:0.5rem; display:none;">
           <div class="spinner"></div>
           <span>Checking availability…</span>
         </div>
@@ -401,13 +432,21 @@
   })();
 
   // ── Team picker ──────────────────────────────────────────────────────────
-  // (Team is passed via URL ?team= param from Google Sites — no picker needed)
+  document.getElementById('teamSelect').addEventListener('change', function () {
+    document.getElementById('btnSelectTeam').disabled = !this.value;
+  });
+
+  document.getElementById('btnSelectTeam').addEventListener('click', function () {
+    selectedTeam = document.getElementById('teamSelect').value;
+    if (!selectedTeam) return;
+    showOrderForm(selectedTeam);
+  });
 
   function showOrderForm(team) {
     const teamName = TEAMS[team];
     document.getElementById('formTeamHeading').innerHTML =
       teamName + '<br><span style="color:var(--accent)">Jerseys</span>';
-    showScreen('teamPickerScreen');
+    showScreen('orderFormScreen');
     loadNumbers();
     document.getElementById('numberSelect').addEventListener('change', updateSummary);
   }
@@ -563,7 +602,7 @@
   }
 
   function showScreen(id) {
-    ['successScreen', 'teamPickerScreen'].forEach(function (s) {
+    ['successScreen', 'teamPickerScreen', 'orderFormScreen'].forEach(function (s) {
       document.getElementById(s).style.display = s === id ? 'block' : 'none';
     });
   }
